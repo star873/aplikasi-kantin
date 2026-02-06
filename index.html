@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Kantin Sekolah</title>
+
+<style>
+body{
+    font-family: Arial;
+    background: linear-gradient(120deg,#74ebd5,#9face6);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    min-height:100vh;
+}
+.card{
+    background:white;
+    padding:25px;
+    width:380px;
+    border-radius:12px;
+}
+label{
+    font-weight:bold;
+    margin-top:10px;
+    display:block;
+}
+input,select,button{
+    width:100%;
+    padding:10px;
+    margin-top:5px;
+}
+button{
+    background:#4CAF50;
+    color:white;
+    border:none;
+    cursor:pointer;
+    margin-top:15px;
+}
+.info{
+    margin-top:10px;
+}
+.result{
+    margin-top:15px;
+    border-top:1px solid #ccc;
+    padding-top:10px;
+}
+.kurang{
+    color:red;
+    font-weight:bold;
+}
+</style>
+</head>
+
+<body>
+<div class="card">
+<h2>🍽️ Kantin Sekolah</h2>
+
+<form method="post">
+    <label>Nama Pembeli</label>
+    <input type="text" name="nama" required>
+
+    <label>Menu</label>
+    <select name="menu" id="menu" onchange="hitung()" required>
+        <option value="" data-harga="0">-- Pilih Menu --</option>
+        {% for nama, harga in menu.items() %}
+        <option value="{{ nama }}" data-harga="{{ harga }}">
+            {{ nama }} - Rp{{ "{:,}".format(harga).replace(",", ".") }}
+        </option>
+        {% endfor %}
+    </select>
+
+    <label>Jumlah</label>
+    <input type="number" name="jumlah" id="jumlah" value="1" min="1" oninput="hitung()" required>
+
+    <div class="info">
+        Harga: <b>Rp<span id="harga">0</span></b><br>
+        Total: <b>Rp<span id="total">0</span></b>
+    </div>
+
+    <label>Uang Bayar</label>
+    <input type="number" name="bayar" required>
+
+    <button type="submit">Bayar</button>
+</form>
+
+{% if hasil %}
+<div class="result">
+    <h3>🧾 Struk</h3>
+    <p>Nama: <b>{{ hasil.nama }}</b></p>
+    <p>Menu: {{ hasil.item }}</p>
+    <p>Total: <b>Rp{{ "{:,}".format(hasil.total).replace(",", ".") }}</b></p>
+    <p>Bayar: Rp{{ "{:,}".format(hasil.bayar).replace(",", ".") }}</p>
+
+    {% if hasil.kembalian >= 0 %}
+        <p><b>Kembalian: Rp{{ "{:,}".format(hasil.kembalian).replace(",", ".") }}</b></p>
+    {% else %}
+        <p class="kurang">Uang kurang Rp{{ "{:,}".format(-hasil.kembalian).replace(",", ".") }}</p>
+    {% endif %}
+</div>
+{% endif %}
+</div>
+
+<script>
+function formatRupiah(angka){
+    return angka.toString().replace(/\B(?=(\d{3})+(?!\d))/g,".");
+}
+
+function hitung(){
+    let menu = document.getElementById("menu");
+    let harga = menu.options[menu.selectedIndex].dataset.harga || 0;
+    let jumlah = document.getElementById("jumlah").value;
+
+    document.getElementById("harga").innerText = formatRupiah(harga);
+    document.getElementById("total").innerText = formatRupiah(harga * jumlah);
+}
+</script>
+</body>
+</html>
